@@ -4,6 +4,8 @@ from tkinter import *
 # well it was simple in the beginning
 
 def button_add(input: int):
+    if "=" in e.get().split(" "):
+        e.delete(0, END)
     e.insert(END, input)
 
 def clear():
@@ -20,35 +22,36 @@ def clean(ls: list, idx: int, result: float) -> list:
     del ls[idx]
     return ls
 
-def find_op(op: str, expression: list) -> list:
+def find_op(case: list, expression: list) -> list:
     """Find and evaluate all expressions for a given operator,
-    removing evaluated expressionsand leaving only the result."""
+    removing evaluated expressions and leaving only the result."""
 
-    while op in expression:
+    while bool([op for op in case if(op in expression)]):
         # print(expression)
         # print(len(expression))
         for i, elem in enumerate(expression):
             # print("1", i, elem)
-            if elem == op and op == "x":
+            if elem in case and elem == "x":
                 result = float(expression[i-1]) * float(expression[i+1])
                 expression = clean(expression, i, result)
                 break
-            elif elem == op and op == "/":
+            elif elem in case and elem == "/":
                 result = float(expression[i-1]) / float(expression[i+1])
                 expression = clean(expression, i, result)
                 break
-            elif elem == op and op == "+":
+            elif elem in case and elem == "+":
                 # for j, elem in enumerate(expression):
                 #     print("2", j, elem)
                 result = float(expression[i-1]) + float(expression[i+1])
                 expression = clean(expression, i, result)
                 break
-            elif elem == op and op == "-":
+            elif elem in case and elem == "-":
                 result = float(expression[i-1]) - float(expression[i+1])
                 expression = clean(expression, i, result)
                 break
-        print("Solved all '{}' subexpressions.".format(op))
+        print("Solving all '{}' subexpressions.".format([op for op in case]))
         print(" ".join([str(elem) for elem in expression]))
+    print("Solved all '{}' subexpressions.".format([op for op in case]))
     return expression
 
 def eval():
@@ -60,16 +63,15 @@ def eval():
 
     print("Initial expression:")
     print(" ".join([str(elem) for elem in split_ex]))
-    
-    global result
-    result = 0.0
 
     # order in which we want to evaluate these operators
-    operators = ["x", "/", "+", "-"]
+    # x and / before - and + but from left to right in the
+    # respective cases
+    operators = [["x", "/"], ["-", "+"]]
    
-    for operator in operators:
-        print("Searching for {}".format(operator))
-        split_ex = find_op(operator, split_ex)
+    for case in operators:
+        print("Searching for {}".format(" ".join([op for op in case])))
+        split_ex = find_op(case, split_ex)
         if len(split_ex) == 1:
             result = split_ex[0]
             # return integer if result is integer
